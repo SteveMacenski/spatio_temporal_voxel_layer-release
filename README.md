@@ -1,3 +1,26 @@
+## spatio_temporal_voxel_layer (kinetic) - 1.1.4-2
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release --rosdistro kinetic --track kinetic spatio_temporal_voxel_layer` on `Wed, 19 Sep 2018 02:43:04 -0000`
+
+The `spatio_temporal_voxel_layer` package was released.
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer-release.git
+- rosdistro version: `1.1.3-0`
+- old version: `1.1.4-1`
+- new version: `1.1.4-2`
+
+Versions of tools used:
+
+- bloom version: `0.6.6`
+- catkin_pkg version: `0.4.8`
+- rosdep version: `0.12.2`
+- rosdistro version: `0.6.9`
+- vcstools version: `0.1.40`
+
+
 ## spatio_temporal_voxel_layer (kinetic) - 1.1.4-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release --rosdistro kinetic --track kinetic spatio_temporal_voxel_layer` on `Wed, 19 Sep 2018 02:36:50 -0000`
