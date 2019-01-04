@@ -10,7 +10,11 @@ An simple example video can be seen [here](https://www.youtube.com/watch?v=8YIFP
 
 ![ezgif com-video-to-gif](https://user-images.githubusercontent.com/14944147/37010885-b18fe1f8-20bb-11e8-8c28-5b31e65f2844.gif)
 
-We found in experimental trials with **6** 7hz dense stereo RGBD cameras we ran the major move_base process at **20-50%** nominal from **80-110%** on a 5th gen i7 CPU in the global costmap updating using the existing `voxel_layer`.  
+We found in experimental trials with **6** 7hz dense stereo RGBD cameras we ran the major move_base process at **20-50%** nominal from **80-110%** on a 5th gen i7 CPU in the global costmap updating using the existing `voxel_layer`. 
+
+Steve spoke at ROSCon 2018 about STVL and his presentation is [linked here](https://vimeo.com/292699571) (or click on image). 
+
+[![IMAGE ALT TEXT](https://user-images.githubusercontent.com/14944147/46768837-987c9280-cc9e-11e8-99ea-788d3d590dd8.png)](https://vimeo.com/292699571)
 
 ## **Spatio**-
 The Spatio in this package is the representation of the environment in a configurable `voxel_size` voxel grid stored and searched by OpenVDB. 
@@ -24,7 +28,7 @@ Below is an example a size of map that is **trivial** for the Spatio-Temportal V
 ## -**Temporal**
 The Temporal in this package is the novel concept of `voxel_decay` whereas we have configurable functions that expire voxels and their occupation over time. Infrasture was created to store times in each voxel after which the voxel will disappear from the map. This is combined with checking inclusion of voxels in current measurement frustums to accelerate the decay of those voxels that do not have measurements but should if still in the scene and remain marked. This is done rather than simply clearing them naively or via costly raytracing. The time it takes to clear depends on the configured functions and acceleration factors.
 
-Voxel acceleration uses given FOV to compute traditional 6-planed cubical frustums. Sensors that cannot be modelled by traditional frustums (i.e. 360 lidars or sensors without flat back planes) the frustum acceleration mathematics breakdown, **do not use frustum acceleration for these class of sensors**. PRs to implement curved frustums are welcome and encouraged.  
+Voxel acceleration uses given FOV to compute the frustum geometry. Depth cameras (e.g. Intel Realsense) are modeled with traditional 6-planed cubical frustums. 3D lidars (e.g. Velodyne VLP 16) are modeled with their hourglass-shaped FOV. Although many 3D lidars have 360 degree horizontal FOV, it is possible to use a narrower angle for the clearing frustum by setting the hFOV parameter accordingly.
 
 Future extensions will also to query a static map and determine which connected components belong to the map, not in the map, or moving. Each of these three classes of blobs will have configurable models to control the time they persist, and if these things are reported to the user.
 
@@ -60,31 +64,7 @@ sudo apt-get install ros-kinetic-spatio-temporal-voxel-layer
 ### Install from source
 Required dependencies ROS Kinetic, navigation, OpenVDB, TBB.
 
-If you are familiar with ROS, I have setup rosdep to work with all the necessary libraries, no need to install manually. In your workspace:
-
 `sudo rosdep init && rosdep update && rosdep install --from-paths src --ignore-src -r -y`
-
-If you are not familiar or cannot get rosdep to work, the dependencies and docs are listed below. 
-
-#### ROS
-
-[See install instructions here.](http://wiki.ros.org/kinetic/Installation)
-
-#### Navigation
-
-`sudo apt-get install ros-kinetic-navigation`
-
-#### OpenVDB
-
-`sudo apt-get install libopenvdb3.1 libopenvdb-dev libopenvdb-tools`
-
-#### TBB
-
-`sudo apt-get install libtbb-dev libtbb2`
-
-#### OpenEXR
-
-`sudo apt-get install libopenexr-dev`
 
 ## Configuration and Running
 
@@ -134,6 +114,7 @@ rgbd_obstacle_layer:
     vertical_fov_angle: 0.7      #default 0.7, radians
     horizontal_fov_angle: 1.04   #default 1.04, radians
     decay_acceleration: 1.       #default 0, 1/s^2. If laser scanner MUST be 0
+    model_type: 0                #default 0 (depth camera). Use 1 for 3D Lidar
 ```
 
 ### local/global_costmap_params.yaml
@@ -147,7 +128,20 @@ Add this plugin to your costmap params file.
 
 `roslaunch [navigation_pkg] move_base.launch`
 
+### Enabing/disabling observation_sources real-time
 
+To enable/disable observation sources use a ros service for each source:
+
+~rgbd_obstacle_layer/$(source_name)/toggle_enabled (std_srvs/SetBool)
+  -  request.data = true   // Enable observation source
+  -  request.data = false  // Disable observation source
+  
+ Example:
+ ```
+ rosservice call /move_base/global_costmap/rgbd_obstacle_layer/rgbd_back/toggle_enabled "data: true"
+ rosservice call /move_base/local_costmap/rgbd_obstacle_layer/rgbd_back/toggle_enabled "data: false"
+ ```
+ 
 ### Debug and Model Fitting
 
 I have made the frustum transformations available for visualization and debugging. You may enable them by the `VISUALIZE_FRUSTUM` macro, though be aware it takes a substantial decrease on performance since we're creating and destroying a ros publisher at a non-trivial rate.
