@@ -62,13 +62,21 @@
 #include <openvdb/tools/RayIntersector.h>
 // measurement struct and buffer
 #include <spatio_temporal_voxel_layer/measurement_buffer.hpp>
-#include <spatio_temporal_voxel_layer/frustum.hpp>
-// Mutex
-#include <boost/thread/mutex.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <spatio_temporal_voxel_layer/frustum_models/depth_camera_frustum.hpp>
+#include <spatio_temporal_voxel_layer/frustum_models/three_dimensional_lidar_frustum.hpp>
+// Mutex and locks
+#include <boost/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace volume_grid
 {
+
+enum GlobalDecayModel
+{
+  LINEAR = 0,
+  EXPONENTIAL = 1,
+  PERSISTENT = 2
+};
 
 // Structure for an occupied cell for map
 struct occupany_cell
@@ -89,11 +97,18 @@ struct occupany_cell
 // Structure for wrapping frustum model and necessary metadata
 struct frustum_model
 {
-  frustum_model(geometry::Frustum _frustum, const double& _factor) :
+  frustum_model(geometry::Frustum* _frustum, const double& _factor) :
     frustum(_frustum), accel_factor(_factor)
   {
   }
-  geometry::Frustum frustum;
+  ~frustum_model()
+  {
+    if (frustum)
+    {
+      delete frustum;
+    }
+  }
+  geometry::Frustum* frustum;
   const double accel_factor;
 };
 
@@ -105,8 +120,8 @@ public:
   typedef openvdb::math::Ray<openvdb::Real> GridRay;
   typedef openvdb::math::Ray<openvdb::Real>::Vec3T Vec3Type;
 
-  SpatioTemporalVoxelGrid(const float& voxel_size, const int& background_value,
-                          const int& decay_model, const double& voxel_decay,
+  SpatioTemporalVoxelGrid(const float& voxel_size, const double& background_value,
+                          const GlobalDecayModel& decay_model, const double& voxel_decay,
                           const bool& pub_voxels);
   ~SpatioTemporalVoxelGrid(void);
 
@@ -150,8 +165,8 @@ protected:
   openvdb::Vec3d IndexToWorld(const openvdb::Coord& coord) const;
 
   mutable openvdb::DoubleGrid::Ptr _grid;
-  int                             _background_value, _decay_model;
-  double                          _voxel_size, _voxel_decay;
+  GlobalDecayModel                _decay_model;
+  double                          _background_value, _voxel_size, _voxel_decay;
   bool                            _pub_voxels;
   pcl::PointCloud<pcl::PointXYZ>::Ptr     _pc;
   std::unordered_map<occupany_cell, uint>* _cost_map;
