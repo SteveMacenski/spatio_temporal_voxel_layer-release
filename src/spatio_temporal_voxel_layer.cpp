@@ -230,9 +230,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                    topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf::MessageFilter<sensor_msgs::LaserScan>
-          > filter(new tf::MessageFilter<sensor_msgs::LaserScan>(*sub, \
-                                                     *tf_, _global_frame, 50));
+      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::LaserScan>
+          > filter(new tf2_ros::MessageFilter<sensor_msgs::LaserScan>(*sub, \
+                                                     *tf_, _global_frame, 50,0));
 
       if (inf_is_valid)
       {
@@ -258,9 +258,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                      topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud2>
-          > filter(new tf::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
-                                                  *tf_, _global_frame, 50));
+      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::PointCloud2>
+          > filter(new tf2_ros::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
+                                                  *tf_, _global_frame, 50,0));
       filter->registerCallback(
           boost::bind(&SpatioTemporalVoxelLayer::PointCloud2Callback, this, _1, \
                                                    _observation_buffers.back()));
@@ -749,13 +749,11 @@ void SpatioTemporalVoxelLayer::updateBounds( \
   // publish point cloud in navigation mode
   if (_publish_voxels && !_mapping_mode)
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pc(new pcl::PointCloud<pcl::PointXYZ>);
-    _voxel_grid->GetOccupancyPointCloud(pc);
-    sensor_msgs::PointCloud2 pc2;
-    pcl::toROSMsg(*pc, pc2);
-    pc2.header.frame_id = _global_frame;
-    pc2.header.stamp = ros::Time::now();
-    _voxel_pub.publish(pc2);
+    sensor_msgs::PointCloud2::Ptr pc2(new sensor_msgs::PointCloud2());
+    _voxel_grid->GetOccupancyPointCloud(pc2);
+    pc2->header.frame_id = _global_frame;
+    pc2->header.stamp = ros::Time::now();
+    _voxel_pub.publish(*pc2);
   }
 
   // update footprint

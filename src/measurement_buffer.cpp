@@ -47,7 +47,7 @@ MeasurementBuffer::MeasurementBuffer(const std::string& topic_name,          \
                                      const double& min_obstacle_height,      \
                                      const double& max_obstacle_height,      \
                                      const double& obstacle_range,           \
-                                     tf::TransformListener& tf,              \
+                                     tf2_ros::Buffer& tf,                    \
                                      const std::string& global_frame,        \
                                      const std::string& sensor_frame,        \
                                      const double& tf_tolerance,             \
@@ -65,7 +65,7 @@ MeasurementBuffer::MeasurementBuffer(const std::string& topic_name,          \
                                      const bool& clear_buffer_after_reading, \
                                      const ModelType& model_type) :
 /*****************************************************************************/
-    _tf(tf), _observation_keep_time(observation_keep_time), 
+    _buffer(tf), _observation_keep_time(observation_keep_time),
     _expected_update_rate(expected_update_rate),_last_updated(ros::Time::now()), 
     _global_frame(global_frame), _sensor_frame(sensor_frame),
     _topic_name(topic_name), _min_obstacle_height(min_obstacle_height), 
@@ -90,27 +90,6 @@ MeasurementBuffer::~MeasurementBuffer(void)
 void MeasurementBuffer::BufferROSCloud(const sensor_msgs::PointCloud2& cloud)
 /*****************************************************************************/
 {
-  try
-  {
-    pcl::PCLPointCloud2 pcl_pc2;
-    pcl_conversions::toPCL(cloud, pcl_pc2);
-    pcl::PointCloud < pcl::PointXYZ > pcl_cloud;
-    pcl::fromPCLPointCloud2(pcl_pc2, pcl_cloud);
-    BufferPCLCloud(pcl_cloud);
-  }
-  catch (pcl::PCLException& ex)
-  {
-    ROS_ERROR("Failed to convert to pcl type, dropping observation: %s", \
-              ex.what());
-    return;
-  }
-}
-
-/*****************************************************************************/
-void MeasurementBuffer::BufferPCLCloud(const \
-                                         pcl::PointCloud<pcl::PointXYZ>& cloud)
-/*****************************************************************************/
-{
   // add a new measurement to be populated
   _observation_list.push_front(observation::MeasurementReading());
 
@@ -120,23 +99,26 @@ void MeasurementBuffer::BufferPCLCloud(const \
   try
   {
     // transform into global frame
-    geometry_msgs::Quaternion orientation;
-    tf::Stamped<tf::Pose> local_pose, global_pose;
-    local_pose.setOrigin(tf::Vector3(0, 0, 0));
-    local_pose.setRotation(tf::Quaternion(0, 0, 0, 1));
-    local_pose.stamp_ = pcl_conversions::fromPCL(cloud.header).stamp;
-    local_pose.frame_id_ = origin_frame;
+    geometry_msgs::PoseStamped  local_pose, global_pose;
+    local_pose.pose.position.x=0;
+    local_pose.pose.position.y=0;
+    local_pose.pose.position.z=0;
+    local_pose.pose.orientation.x=0;
+    local_pose.pose.orientation.y=0;
+    local_pose.pose.orientation.z=0;
+    local_pose.pose.orientation.w=1;
+    local_pose.header.stamp = cloud.header.stamp;
+    local_pose.header.frame_id = origin_frame;
 
-    _tf.waitForTransform(_global_frame, local_pose.frame_id_, \
-                         local_pose.stamp_, ros::Duration(0.5));
-    _tf.transformPose(_global_frame, local_pose, global_pose);
+    _buffer.canTransform(_global_frame, local_pose.header.frame_id , \
+                         local_pose.header.stamp, ros::Duration(0.5));
+    _buffer.transform(local_pose, global_pose, _global_frame);
 
-    _observation_list.front()._origin.x = global_pose.getOrigin().getX();
-    _observation_list.front()._origin.y = global_pose.getOrigin().getY();
-    _observation_list.front()._origin.z = global_pose.getOrigin().getZ();
+    _observation_list.front()._origin.x = global_pose.pose.position.x;
+    _observation_list.front()._origin.y = global_pose.pose.position.y;
+    _observation_list.front()._origin.z = global_pose.pose.position.z;
 
-    tf::quaternionTFToMsg(global_pose.getRotation(), orientation);
-    _observation_list.front()._orientation = orientation;
+    _observation_list.front()._orientation = global_pose.pose.orientation;
     _observation_list.front()._obstacle_range_in_m = _obstacle_range;
     _observation_list.front()._min_z_in_m = _min_z;
     _observation_list.front()._max_z_in_m = _max_z;
@@ -154,49 +136,44 @@ void MeasurementBuffer::BufferPCLCloud(const \
       return;
     }
 
-    point_cloud_ptr cld_global(new pcl::PointCloud<pcl::PointXYZ>);
+    // transform the cloud in the global frame
+    point_cloud_ptr cld_global(new sensor_msgs::PointCloud2());
+    geometry_msgs::TransformStamped tf_stamped = _buffer.lookupTransform( \
+                 _global_frame, cloud.header.frame_id, cloud.header.stamp);
+    tf2::doTransform (cloud, *cld_global, tf_stamped);
 
-    pcl_ros::transformPointCloud(_global_frame, cloud, *cld_global, _tf);
-    cld_global->header.stamp = cloud.header.stamp;
+    pcl::PCLPointCloud2::Ptr cloud_pcl (new pcl::PCLPointCloud2 ());
+    pcl::PCLPointCloud2::Ptr cloud_filtered (new pcl::PCLPointCloud2 ());
 
-    // if user wants to use a voxel filter
+    pcl_conversions::toPCL(*cld_global, *cloud_pcl);
+
+    // remove points that are below or above our height restrictions, and
+    // in the same time, remove NaNs and if user wants to use it, combine with a
     if ( _voxel_filter )
     {
-      // remove nans because they show things down
-      point_cloud_ptr cld_no_nan(new pcl::PointCloud<pcl::PointXYZ>);
-      std::vector<int> indices;
-      pcl::removeNaNFromPointCloud(*cld_global, *cld_no_nan, indices);
-
-      // minimize information needed to process
-      cld_global->clear();
-      pcl::ApproximateVoxelGrid<pcl::PointXYZ> sor1;
-      sor1.setInputCloud (cld_no_nan);
-      sor1.setLeafSize ((float)_voxel_size,
-                        (float)_voxel_size,
-                        (float)_voxel_size);
-      sor1.filter (*cld_global);
+      pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+      sor.setInputCloud (cloud_pcl);
+      sor.setFilterFieldName("z");
+      sor.setFilterLimits(_min_obstacle_height,_max_obstacle_height);
+      sor.setDownsampleAllData(false);
+      sor.setLeafSize ((float)_voxel_size,
+                       (float)_voxel_size,
+                       (float)_voxel_size);
+      sor.filter(*cloud_filtered);
     }
-
-    // remove points that are below or above our height restrictions
-    pcl::PointCloud<pcl::PointXYZ>& obs_cloud = \
-                                *(_observation_list.front()._cloud);
-    unsigned int cloud_size = cld_global->points.size();
-
-    obs_cloud.points.resize(cloud_size);
-    unsigned int point_count = 0;
-    pcl::PointCloud<pcl::PointXYZ>::iterator it;
-    for (it = cld_global->begin(); it != cld_global->end(); ++it)
+    else
     {
-      if (it->z <= _max_obstacle_height && it->z >= _min_obstacle_height)
-      {
-        obs_cloud.points.at(point_count++) = *it;
-      }
+      pcl::PassThrough<pcl::PCLPointCloud2> pass_through_filter;
+      pass_through_filter.setInputCloud(cloud_pcl);
+      pass_through_filter.setKeepOrganized(false);
+      pass_through_filter.setFilterFieldName("z");
+      pass_through_filter.setFilterLimits( \
+                  _min_obstacle_height,_max_obstacle_height);
+      pass_through_filter.filter(*cloud_filtered);
     }
 
-    // resize the cloud for the number of legal points
-    obs_cloud.points.resize(point_count);
-    obs_cloud.header.stamp = cloud.header.stamp;
-    obs_cloud.header.frame_id = cld_global->header.frame_id;
+    pcl_conversions::fromPCL(*cloud_filtered, *cld_global);
+    _observation_list.front()._cloud = cld_global;
   }
   catch (tf::TransformException& ex)
   {
@@ -245,8 +222,7 @@ void MeasurementBuffer::RemoveStaleObservations(void)
   for (it = _observation_list.begin(); it != _observation_list.end(); ++it)
   {
     observation::MeasurementReading& obs = *it;
-    const ros::Duration time_diff = \
-            _last_updated - pcl_conversions::fromPCL(obs._cloud->header).stamp;
+    const ros::Duration time_diff = _last_updated - obs._cloud->header.stamp;
 
     if (time_diff > _observation_keep_time)
     {
