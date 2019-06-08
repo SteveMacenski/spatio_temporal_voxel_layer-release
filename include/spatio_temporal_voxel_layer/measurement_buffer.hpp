@@ -1,4 +1,4 @@
-/*********************************************************************
+/********************************************************************
  *
  * Software License Agreement
  *
@@ -43,7 +43,9 @@
 #include <spatio_temporal_voxel_layer/measurement_reading.h>
 // PCL
 #include <pcl_ros/transforms.h>
-#include <pcl/filters/approximate_voxel_grid.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/filters/passthrough.h>
 // STL
 #include <vector>
 #include <list>
@@ -52,11 +54,13 @@
 #include <ros/ros.h>
 #include <ros/time.h>
 // TF
-#include <tf/transform_listener.h>
-#include <tf/transform_datatypes.h>
+#include <tf2_ros/buffer.h>
+#include "message_filters/subscriber.h"
 // msgs
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 // Mutex
 #include <boost/thread.hpp>
 
@@ -65,7 +69,7 @@ namespace buffer
 
 // conveniences for line lengths
 typedef std::list<observation::MeasurementReading>::iterator readings_iter;
-typedef pcl::PointCloud<pcl::PointXYZ>::Ptr point_cloud_ptr;
+typedef sensor_msgs::PointCloud2::Ptr point_cloud_ptr;
 
 // Measurement buffer
 class MeasurementBuffer
@@ -77,7 +81,7 @@ public:
                     const double& min_obstacle_height,      \
                     const double& max_obstacle_height,      \
                     const double& obstacle_range,           \
-                    tf::TransformListener& tf,              \
+                    tf2_ros::Buffer& tf,                    \
                     const std::string& global_frame,        \
                     const std::string& sensor_frame,        \
                     const double& tf_tolerance,             \
@@ -99,7 +103,6 @@ public:
 
   // Buffers for different types of pointclouds
   void BufferROSCloud(const sensor_msgs::PointCloud2& cloud);
-  void BufferPCLCloud(const pcl::PointCloud<pcl::PointXYZ>& cloud);
 
   // Get measurements from the buffer
   void GetReadings(std::vector<observation::MeasurementReading>& observations);
@@ -122,7 +125,7 @@ private:
   // Removing old observations from buffer
   void RemoveStaleObservations(void);
 
-  tf::TransformListener& _tf;
+  tf2_ros::Buffer& _buffer;
   const ros::Duration _observation_keep_time, _expected_update_rate;
   boost::recursive_mutex _lock;
   ros::Time _last_updated;
