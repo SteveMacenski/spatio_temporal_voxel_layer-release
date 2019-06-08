@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>spatio_temporal_voxel_layer</name>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
   <description>The spatio-temporal 3D obstacle costmap package</description>
 
   <maintainer email="stevenmacenski@gmail.com">Steve Macenski</maintainer>
@@ -20,6 +20,7 @@
   <build_depend>roscpp</build_depend>
   <build_depend>message_filters</build_depend>
   <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>libopenvdb-dev</build_depend>
@@ -38,6 +39,7 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2_geometry_msgs</run_depend>
   <run_depend>visualization_msgs</run_depend>
   <run_depend>libopenvdb-dev</run_depend>
   <run_depend>libopenvdb</run_depend>
