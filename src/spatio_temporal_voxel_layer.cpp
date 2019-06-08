@@ -230,9 +230,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                    topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf::MessageFilter<sensor_msgs::LaserScan>
-          > filter(new tf::MessageFilter<sensor_msgs::LaserScan>(*sub, \
-                                                     *tf_, _global_frame, 50));
+      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::LaserScan>
+          > filter(new tf2_ros::MessageFilter<sensor_msgs::LaserScan>(*sub, \
+                                                     *tf_, _global_frame, 50,0));
 
       if (inf_is_valid)
       {
@@ -258,9 +258,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                      topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud2>
-          > filter(new tf::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
-                                                  *tf_, _global_frame, 50));
+      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::PointCloud2>
+          > filter(new tf2_ros::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
+                                                  *tf_, _global_frame, 50,0));
       filter->registerCallback(
           boost::bind(&SpatioTemporalVoxelLayer::PointCloud2Callback, this, _1, \
                                                    _observation_buffers.back()));
@@ -582,24 +582,6 @@ void SpatioTemporalVoxelLayer::DynamicReconfigureCallback( \
 /*****************************************************************************/
 {
   boost::recursive_mutex::scoped_lock lock(_voxel_grid_lock);
-  bool update_grid(false);
-  auto updateFlagIfChanged = [&update_grid](auto& own, const auto& reference)
-  {
-    if (static_cast<float>(std::abs(own - reference)) >= FLT_EPSILON)
-    {
-      own = reference;
-      update_grid = true;
-    }
-  };
-
-  auto default_value = (config.track_unknown_space) ? \
-                          costmap_2d::NO_INFORMATION : costmap_2d::FREE_SPACE;
-  updateFlagIfChanged(default_value_, default_value);
-  updateFlagIfChanged(_voxel_size, config.voxel_size);
-  updateFlagIfChanged(_voxel_decay, config.voxel_decay);
-  int decay_model_int = (int)_decay_model;
-  updateFlagIfChanged(decay_model_int, config.decay_model);
-  updateFlagIfChanged(_publish_voxels, config.publish_voxel_map);
 
   _enabled = config.enabled;
   _combination_method = config.combination_method;
@@ -607,10 +589,17 @@ void SpatioTemporalVoxelLayer::DynamicReconfigureCallback( \
   _update_footprint_enabled = config.update_footprint_enabled;
   _mapping_mode = config.mapping_mode;
   _map_save_duration = ros::Duration(config.map_save_duration);
-  _decay_model = static_cast<volume_grid::GlobalDecayModel>(decay_model_int);
 
-  if (update_grid)
+  if (level >=1) //update grid
   {
+    auto default_value = (config.track_unknown_space) ? \
+                            costmap_2d::NO_INFORMATION : costmap_2d::FREE_SPACE;
+    default_value_ = default_value;
+    _voxel_size = config.voxel_size;
+    _voxel_decay = config.voxel_decay;
+    _decay_model = static_cast<volume_grid::GlobalDecayModel>(config.decay_model);
+    _publish_voxels = config.publish_voxel_map;
+
     delete _voxel_grid;
     _voxel_grid = new volume_grid::SpatioTemporalVoxelGrid(_voxel_size, \
       static_cast<double>(default_value_), _decay_model, \
@@ -749,13 +738,11 @@ void SpatioTemporalVoxelLayer::updateBounds( \
   // publish point cloud in navigation mode
   if (_publish_voxels && !_mapping_mode)
   {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pc(new pcl::PointCloud<pcl::PointXYZ>);
-    _voxel_grid->GetOccupancyPointCloud(pc);
-    sensor_msgs::PointCloud2 pc2;
-    pcl::toROSMsg(*pc, pc2);
-    pc2.header.frame_id = _global_frame;
-    pc2.header.stamp = ros::Time::now();
-    _voxel_pub.publish(pc2);
+    sensor_msgs::PointCloud2::Ptr pc2(new sensor_msgs::PointCloud2());
+    _voxel_grid->GetOccupancyPointCloud(pc2);
+    pc2->header.frame_id = _global_frame;
+    pc2->header.stamp = ros::Time::now();
+    _voxel_pub.publish(*pc2);
   }
 
   // update footprint
