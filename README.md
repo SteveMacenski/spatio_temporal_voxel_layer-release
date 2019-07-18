@@ -1,3 +1,26 @@
+## spatio_temporal_voxel_layer (melodic) - 1.3.5-2
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --ros-distro melodic --track melodic spatio_temporal_voxel_layer` on `Thu, 18 Jul 2019 18:56:17 -0000`
+
+The `spatio_temporal_voxel_layer` package was released.
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer-release.git
+- rosdistro version: `1.3.4-1`
+- old version: `1.3.5-1`
+- new version: `1.3.5-2`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.12`
+- rosdep version: `0.15.2`
+- rosdistro version: `0.7.4`
+- vcstools version: `0.1.40`
+
+
 ## spatio_temporal_voxel_layer (melodic) - 1.3.5-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --ros-distro melodic --track melodic spatio_temporal_voxel_layer` on `Thu, 18 Jul 2019 18:54:58 -0000`
