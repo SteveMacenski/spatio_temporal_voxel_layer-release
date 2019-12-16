@@ -1,4 +1,4 @@
-# Spatio-Temporal Voxel Layer [![Build Status](http://build.ros.org/buildStatus/icon?job=Kdev__spatio_temporal_voxel_layer__ubuntu_xenial_amd64)](http://build.ros.org/view/Kbin_uX64/job/Kdev__spatio_temporal_voxel_layer__ubuntu_xenial_amd64/)
+# Spatio-Temporal Voxel Layer
 
 This is a drop in replacement for the voxel_grid voxel representation of the environment. This package does a number of things to improve on the voxel grid package and extend the capabilities offered to the users, under a LGPL v2.1 license. Developed and maintained by [Steven Macenski](https://www.linkedin.com/in/steven-macenski-41a985101/) at [Simbe Robotics](http://www.simberobotics.com/).
 
@@ -116,6 +116,7 @@ rgbd_obstacle_layer:
     clear_after_reading: true    #default false, clear the buffer after the layer gets readings from it
     voxel_filter: true           #default off, apply voxel filter to sensor, recommend on 
   rgbd1_clear:
+    enabled: true                #default true, can be toggled on/off with associated service call
     data_type: PointCloud2
     topic: camera1/depth/points
     marking: false
