@@ -1,0 +1,12 @@
+Source: ros-dashing-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: Steve Macenski <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libilmbase-dev, libopenexr-dev, libopenvdb-dev, libopenvdb5.0, libpcl-apps1.8, libpcl-common1.8, libpcl-features1.8, libpcl-filters1.8, libpcl-io1.8, libpcl-kdtree1.8, libpcl-keypoints1.8, libpcl-ml1.8, libpcl-octree1.8, libpcl-outofcore1.8, libpcl-people1.8, libpcl-recognition1.8, libpcl-registration1.8, libpcl-sample-consensus1.8, libpcl-search1.8, libpcl-segmentation1.8, libpcl-stereo1.8, libpcl-surface1.8, libpcl-tracking1.8, libpcl-visualization1.8, libtbb-dev, ros-dashing-ament-cmake, ros-dashing-builtin-interfaces, ros-dashing-geometry-msgs, ros-dashing-laser-geometry, ros-dashing-message-filters, ros-dashing-nav2-costmap-2d, ros-dashing-pcl-conversions, ros-dashing-pluginlib, ros-dashing-rclcpp, ros-dashing-rosidl-default-generators, ros-dashing-sensor-msgs, ros-dashing-std-msgs, ros-dashing-std-srvs, ros-dashing-tf2-geometry-msgs, ros-dashing-tf2-ros, ros-dashing-visualization-msgs, ros-dashing-ros-workspace, ros-dashing-rmw-connext-cpp, ros-dashing-rmw-fastrtps-cpp, ros-dashing-rmw-implementation, ros-dashing-rmw-opensplice-cpp, ros-dashing-rosidl-typesupport-connext-c, ros-dashing-rosidl-typesupport-connext-cpp, ros-dashing-rosidl-typesupport-opensplice-c, ros-dashing-rosidl-typesupport-opensplice-cpp
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-dashing-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libilmbase-dev, libopenexr-dev, libopenvdb-dev, libopenvdb5.0, libpcl-apps1.8, libpcl-common1.8, libpcl-features1.8, libpcl-filters1.8, libpcl-io1.8, libpcl-kdtree1.8, libpcl-keypoints1.8, libpcl-ml1.8, libpcl-octree1.8, libpcl-outofcore1.8, libpcl-people1.8, libpcl-recognition1.8, libpcl-registration1.8, libpcl-sample-consensus1.8, libpcl-search1.8, libpcl-segmentation1.8, libpcl-stereo1.8, libpcl-surface1.8, libpcl-tracking1.8, libpcl-visualization1.8, libtbb-dev, ros-dashing-builtin-interfaces, ros-dashing-geometry-msgs, ros-dashing-laser-geometry, ros-dashing-message-filters, ros-dashing-nav2-costmap-2d, ros-dashing-pcl-conversions, ros-dashing-pluginlib, ros-dashing-rclcpp, ros-dashing-rosidl-default-runtime, ros-dashing-sensor-msgs, ros-dashing-std-msgs, ros-dashing-std-srvs, ros-dashing-tf2-geometry-msgs, ros-dashing-tf2-ros, ros-dashing-visualization-msgs, ros-dashing-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
