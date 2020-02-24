@@ -1,3 +1,26 @@
+## spatio_temporal_voxel_layer (eloquent) - 2.1.3-1
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `eloquent` distro by running `/usr/bin/bloom-release --rosdistro eloquent --track eloquent spatio_temporal_voxel_layer` on `Mon, 24 Feb 2020 20:14:47 -0000`
+
+The `spatio_temporal_voxel_layer` package was released.
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer-release.git
+- rosdistro version: `2.1.2-2`
+- old version: `2.1.2-2`
+- new version: `2.1.3-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.1`
+- catkin_pkg version: `0.4.16`
+- rosdep version: `0.18.0`
+- rosdistro version: `0.8.0`
+- vcstools version: `0.1.42`
+
+
 ## spatio_temporal_voxel_layer (eloquent) - 2.1.2-2
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `eloquent` distro by running `/usr/bin/bloom-release --rosdistro eloquent --track eloquent spatio_temporal_voxel_layer` on `Wed, 18 Dec 2019 21:04:23 -0000`
