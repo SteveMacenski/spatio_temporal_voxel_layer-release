@@ -1,3 +1,26 @@
+## spatio_temporal_voxel_layer (foxy) - 2.1.4-1
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `foxy` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --track foxy --rosdistro foxy --new-track` on `Wed, 15 Dec 2021 20:01:19 -0000`
+
+The `spatio_temporal_voxel_layer` package was released.
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `2.1.4-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## spatio_temporal_voxel_layer (noetic) - 1.4.5-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `noetic` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --track noetic --rosdistro noetic --new-track` on `Wed, 15 Dec 2021 19:54:02 -0000`
