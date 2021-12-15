@@ -1,4 +1,4 @@
-# Spatio-Temporal Voxel Layer [![Build Status](http://build.ros2.org/job/Edev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64/badge/icon)](http://build.ros2.org/job/Edev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64/)
+# Spatio-Temporal Voxel Layer [![Build Status](http://build.ros.org/buildStatus/icon?job=Mdev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64)](http://build.ros.org/view/Kbin_uX64/job/Mdev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64/)
 
 This is a drop in replacement for the voxel_grid voxel representation of the environment. This package does a number of things to improve on the voxel grid package and extend the capabilities offered to the users, under a LGPL v2.1 license. Developed and maintained by [Steven Macenski](https://www.linkedin.com/in/steven-macenski-41a985101/) at [Simbe Robotics](http://www.simberobotics.com/).
 
@@ -27,6 +27,21 @@ We've received feedback from users and have robots operating in the following en
 Steve spoke at ROSCon 2018 about STVL and his presentation is [linked here](https://vimeo.com/292699571) (or click on image). 
 
 [![IMAGE ALT TEXT](https://user-images.githubusercontent.com/14944147/46768837-987c9280-cc9e-11e8-99ea-788d3d590dd8.png)](https://vimeo.com/292699571)
+
+### Cite This Work
+
+```
+@article{doi:10.1177/1729881420910530,
+    author = {Steve Macenski and David Tsai and Max Feinberg},
+    title ={Spatio-temporal voxel layer: A view on robot perception for the dynamic world},
+    journal = {International Journal of Advanced Robotic Systems},
+    volume = {17},
+    number = {2},
+    year = {2020},
+    doi = {10.1177/1729881420910530},
+    URL = {https://doi.org/10.1177/1729881420910530}
+}
+```
 
 ## **Spatio**-
 The Spatio in this package is the representation of the environment in a configurable `voxel_size` voxel grid stored and searched by OpenVDB. 
@@ -84,6 +99,8 @@ Required dependencies ROS Kinetic, navigation, OpenVDB, TBB.
 
 An example fully-described configuration is shown below.
 
+Note: We supply two PCL filters within STVL to massage the data to lower compute overhead. STVL has an approximate voxel filter to make the data more sparse if very dense. It also has a passthrough filter to limit processing data within the valid minimum to maximum height bounds. The voxel filter is recommended if it lowers CPU overhead, otherwise, passthrough filter. No filter is also available if you pre-process your data or are not interested in performance optimizations.
+
 ```
 rgbd_obstacle_layer:
   enabled:               true
@@ -115,7 +132,8 @@ rgbd_obstacle_layer:
     observation_persistence: 0.0 #default 0, use all measurements taken during now-value, 0=latest 
     inf_is_valid: false          #default false, for laser scans
     clear_after_reading: true    #default false, clear the buffer after the layer gets readings from it
-    voxel_filter: true           #default off, apply voxel filter to sensor, recommend on 
+    filter: "voxel"              #default passthrough, apply "voxel", "passthrough", or no filter to sensor data, recommended to have at one filter on
+    voxel_min_points: 0          #default 0, minimum points per voxel for voxel filter
   rgbd1_clear:
     enabled: true                #default true, can be toggled on/off with associated service call
     data_type: PointCloud2

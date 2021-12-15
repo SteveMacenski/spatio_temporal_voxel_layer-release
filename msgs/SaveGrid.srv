@@ -1,4 +1,6 @@
-string file_name
+std_msgs/String file_name
+
 ---
+
 float64 map_size_bytes
 bool status

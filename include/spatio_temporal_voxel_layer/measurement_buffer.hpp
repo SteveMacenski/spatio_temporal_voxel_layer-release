@@ -36,84 +36,88 @@
  * Purpose: buffer incoming measurements for grid
  *********************************************************************/
 
-#ifndef SPATIO_TEMPORAL_VOXEL_LAYER__MEASUREMENT_BUFFER_HPP_
-#define SPATIO_TEMPORAL_VOXEL_LAYER__MEASUREMENT_BUFFER_HPP_
+#ifndef MEASUREMENT_BUFFER_H_
+#define MEASUREMENT_BUFFER_H_
 
+// measurement structs
+#include <spatio_temporal_voxel_layer/measurement_reading.h>
+// PCL
+#include <pcl_ros/transforms.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/filters/passthrough.h>
 // STL
 #include <vector>
 #include <list>
 #include <string>
-#include <chrono>
-#include <memory>
-// measurement structs
-#include "spatio_temporal_voxel_layer/measurement_reading.h"
-// PCL
-#include "pcl/common/transforms.h"
-#include "pcl/filters/voxel_grid.h"
-#include "pcl_conversions/pcl_conversions.h"
-#include "pcl/filters/passthrough.h"
 // ROS
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include <ros/ros.h>
+#include <ros/time.h>
 // TF
-#include "tf2_ros/buffer.h"
+#include <tf2_ros/buffer.h>
 #include "message_filters/subscriber.h"
 // msgs
-#include "sensor_msgs/msg/point_cloud2.hpp"
-#include "geometry_msgs/msg/quaternion.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
+#include <sensor_msgs/PointCloud2.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 // Mutex
-#include "boost/thread.hpp"
+#include <boost/thread.hpp>
 
 namespace buffer
 {
 
+enum class Filters
+{
+  NONE = 0,
+  VOXEL = 1,
+  PASSTHROUGH = 2
+};
+
 // conveniences for line lengths
 typedef std::list<observation::MeasurementReading>::iterator readings_iter;
-typedef std::unique_ptr<sensor_msgs::msg::PointCloud2> point_cloud_ptr;
+typedef sensor_msgs::PointCloud2::Ptr point_cloud_ptr;
 
 // Measurement buffer
 class MeasurementBuffer
 {
 public:
-  MeasurementBuffer(
-    const std::string & topic_name,
-    const double & observation_keep_time,
-    const double & expected_update_rate,
-    const double & min_obstacle_height,
-    const double & max_obstacle_height,
-    const double & obstacle_range,
-    tf2_ros::Buffer & tf,
-    const std::string & global_frame,
-    const std::string & sensor_frame,
-    const double & tf_tolerance,
-    const double & min_d,
-    const double & max_d,
-    const double & vFOV,
-    const double & vFOVPadding,
-    const double & hFOV,
-    const double & decay_acceleration,
-    const bool & marking,
-    const bool & clearing,
-    const double & voxel_size,
-    const bool & voxel_filter,
-    const bool & enabled,
-    const bool & clear_buffer_after_reading,
-    const ModelType & model_type,
-    std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node);
+  MeasurementBuffer(const std::string& topic_name,          \
+                    const double& observation_keep_time,    \
+                    const double& expected_update_rate,     \
+                    const double& min_obstacle_height,      \
+                    const double& max_obstacle_height,      \
+                    const double& obstacle_range,           \
+                    tf2_ros::Buffer& tf,                    \
+                    const std::string& global_frame,        \
+                    const std::string& sensor_frame,        \
+                    const double& tf_tolerance,             \
+                    const double& min_d,                    \
+                    const double& max_d,                    \
+                    const double& vFOV,                     \
+                    const double& vFOVPadding,              \
+                    const double& hFOV,                     \
+                    const double& decay_acceleration,       \
+                    const bool& marking,                    \
+                    const bool& clearing,                   \
+                    const double& voxel_size,               \
+                    const Filters& filter,                  \
+                    const int& voxel_min_points,            \
+                    const bool& enabled,                    \
+                    const bool& clear_buffer_after_reading, \
+                    const ModelType& model_type);
 
   ~MeasurementBuffer(void);
 
   // Buffers for different types of pointclouds
-  void BufferROSCloud(const sensor_msgs::msg::PointCloud2 & cloud);
+  void BufferROSCloud(const sensor_msgs::PointCloud2& cloud);
 
   // Get measurements from the buffer
-  void GetReadings(std::vector<observation::MeasurementReading> & observations);
+  void GetReadings(std::vector<observation::MeasurementReading>& observations);
 
   // enabler setter getter
   bool IsEnabled(void) const;
-  void SetEnabled(const bool & enabled);
+  void SetEnabled(const bool& enabled);
 
   // State knoweldge if sensors are operating as expected
   bool UpdatedAtExpectedRate(void) const;
@@ -129,20 +133,21 @@ private:
   // Removing old observations from buffer
   void RemoveStaleObservations(void);
 
-  tf2_ros::Buffer & _buffer;
-  const rclcpp::Duration _observation_keep_time, _expected_update_rate;
-  rclcpp::Time _last_updated;
+  tf2_ros::Buffer& _buffer;
+  const ros::Duration _observation_keep_time, _expected_update_rate;
   boost::recursive_mutex _lock;
-  std::string _global_frame, _sensor_frame, _topic_name;
+  ros::Time _last_updated;
+  std::string _global_frame, _topic_name, _sensor_frame;
   std::list<observation::MeasurementReading> _observation_list;
   double _min_obstacle_height, _max_obstacle_height, _obstacle_range, _tf_tolerance;
   double _min_z, _max_z, _vertical_fov, _vertical_fov_padding, _horizontal_fov;
-  double _decay_acceleration, _voxel_size;
-  bool _marking, _clearing, _voxel_filter, _clear_buffer_after_reading, _enabled;
+  double  _decay_acceleration, _voxel_size;
+  bool _marking, _clearing, _clear_buffer_after_reading, _enabled;
+  Filters _filter;
+  int _voxel_min_points;
   ModelType _model_type;
-  std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node_;
 };
 
-}  // namespace buffer
+} // namespace buffer
 
-#endif  // SPATIO_TEMPORAL_VOXEL_LAYER__MEASUREMENT_BUFFER_HPP_
+#endif // MEASUREMENT_BUFFER_H_

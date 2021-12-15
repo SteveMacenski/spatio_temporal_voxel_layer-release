@@ -33,58 +33,61 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Author: Steve Macenski (steven.macenski@simberobotics.com)
- * Purpose: Structure for handling camera FOVs to construct frustums
- *          and associated methods
- *********************************************************************/
+ * Purpose: Test minimum configuration of costmap_2d
+/*********************************************************************/
 
-#ifndef DEPTH_FRUSTUM_H_
-#define DEPTH_FRUSTUM_H_
 
-// STVL
-#include <spatio_temporal_voxel_layer/frustum_models/frustum.hpp>
+#include <ros/ros.h>
+#include <costmap_2d/costmap_2d_ros.h>
+#include <tf/transform_broadcaster.h>
+#include <thread>
 
-namespace geometry
+#include "tf2_ros/transform_listener.h"
+#include "tf2_ros/message_filter.h"
+#include "message_filters/subscriber.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+
+
+/*****************************************************************************/
+void TransformThread()
+/*****************************************************************************/
 {
+  tf::TransformBroadcaster tfB;
+  tf::Transform transform;
+  transform.setIdentity();
+  transform.setOrigin(tf::Vector3(2.,2.,0.));
 
-// visualize the frustum should someone other than me care
-#define VISUALIZE_FRUSTUM 0
+  ros::Rate r(20);
+  while (ros::ok())
+  {
+    tfB.sendTransform(tf::StampedTransform(transform, ros::Time::now(), \
+                                                        "map", "base_link"));
+    tfB.sendTransform(tf::StampedTransform(transform, ros::Time::now(), \
+                                                "base_link", "camera_link"));
+    r.sleep();
+    ros::spinOnce();
+  }
+}
 
-// A class to model a depth sensor frustum in world space
-class DepthCameraFrustum : public Frustum
+/*****************************************************************************/
+int main(int argc, char **argv)
+/*****************************************************************************/
 {
-public:
-  DepthCameraFrustum(const double& vFOV, const double& hFOV,
-          const double& min_dist, const double& max_dist);
-  virtual ~DepthCameraFrustum(void);
+  ros::init(argc, argv, "STVL_minimal_test");
 
-  // transform plane normals by depth camera pose
-  virtual void TransformModel(void);
+  tf2_ros::Buffer tf_buffer;
+  tf2_ros::TransformListener _tf2(tf_buffer);
+  std::thread t(TransformThread);
 
-  // determine if a point is inside of the transformed frustum
-  virtual bool IsInside(const openvdb::Vec3d& pt);
+  costmap_2d::Costmap2DROS costmap("global_costmap", tf_buffer);
+  costmap.start();
 
-  // set pose of depth camera in global space
-  virtual void SetPosition(const geometry_msgs::Point& origin);
-  virtual void SetOrientation(const geometry_msgs::Quaternion& quat);
-
-private:
-  // utils to find useful frustum metadata
-  void ComputePlaneNormals(void);
-  double Dot(const VectorWithPt3D&, const openvdb::Vec3d&) const;
-  double Dot(const VectorWithPt3D&, const Eigen::Vector3d&) const;
-
-  double _vFOV, _hFOV, _min_d, _max_d;
-  std::vector<VectorWithPt3D> _plane_normals;
-  Eigen::Vector3d _position;
-  Eigen::Quaterniond _orientation;
-  bool _valid_frustum;
-
-  #if VISUALIZE_FRUSTUM
-    std::vector<Eigen::Vector3d> _frustum_pts;
-    ros::Publisher _frustumPub;
-  #endif
-};
-
-} // end namespace
-
-#endif
+  ros::Rate r(10);
+  while (ros::ok())
+  {
+    // then make a thread to do something with a costmap pointer...
+    ros::spinOnce();
+    r.sleep();
+  }
+  return 1;
+}

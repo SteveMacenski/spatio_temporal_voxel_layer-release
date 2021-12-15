@@ -36,16 +36,12 @@
  * Purpose: convert native vdb files to pointclouds
  *********************************************************************/
 
-#ifndef SPATIO_TEMPORAL_VOXEL_LAYER__VDB2PC_HPP_
-#define SPATIO_TEMPORAL_VOXEL_LAYER__VDB2PC_HPP_
-
-// STL
-#include <string>
-#include <iostream>
 // PCL
-#include "pcl/common/transforms.h"
+#include <pcl_ros/transforms.h>
 // OpenVDB
-#include "openvdb/openvdb.h"
+#include <openvdb/openvdb.h>
+// STL
+#include <iostream>
 
 namespace utilities
 {
@@ -54,13 +50,10 @@ class VDB2PCLPointCloud
 {
 public:
   VDB2PCLPointCloud();
-  void SetFile(const std::string & file_name);
-  bool GetCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud);
-
+  void SetFile(const std::string& file_name);
+  bool GetCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud);
 private:
   std::string _file_name;
 };
 
-}  // namespace utilities
-
-#endif  // SPATIO_TEMPORAL_VOXEL_LAYER__VDB2PC_HPP_
+} // end namespace

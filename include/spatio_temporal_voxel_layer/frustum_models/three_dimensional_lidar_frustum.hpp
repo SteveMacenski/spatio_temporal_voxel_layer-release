@@ -37,13 +37,13 @@
  *          and associated methods
  *********************************************************************/
 
-#ifndef SPATIO_TEMPORAL_VOXEL_LAYER__FRUSTUM_MODELS__THREE_DIMENSIONAL_LIDAR_FRUSTUM_HPP_
-#define SPATIO_TEMPORAL_VOXEL_LAYER__FRUSTUM_MODELS__THREE_DIMENSIONAL_LIDAR_FRUSTUM_HPP_
+#ifndef THREE_DIMENSIONAL_LIDAR_FRUSTUM_H_
+#define THREE_DIMENSIONAL_LIDAR_FRUSTUM_H_
 
+// STVL
+#include <spatio_temporal_voxel_layer/frustum_models/frustum.hpp>
 // M_PI
 #include <cmath>
-// STVL
-#include "spatio_temporal_voxel_layer/frustum_models/frustum.hpp"
 
 namespace geometry
 {
@@ -52,25 +52,24 @@ namespace geometry
 class ThreeDimensionalLidarFrustum : public Frustum
 {
 public:
-  ThreeDimensionalLidarFrustum(
-    const double & vFOV, const double & vFOVPadding,
-    const double & hFOV, const double & min_dist, const double & max_dist);
+  ThreeDimensionalLidarFrustum(const double& vFOV, const double& vFOVPadding, 
+          const double& hFOV, const double& min_dist, const double& max_dist);
   virtual ~ThreeDimensionalLidarFrustum(void);
 
   // Does nothing in 3D lidar model
   virtual void TransformModel(void);
 
   // determine if a point is inside of the transformed frustum
-  virtual bool IsInside(const openvdb::Vec3d & pt);
+  virtual bool IsInside(const openvdb::Vec3d& pt);
 
   // set pose of 3d lidar in global space
-  virtual void SetPosition(const geometry_msgs::msg::Point & origin);
-  virtual void SetOrientation(const geometry_msgs::msg::Quaternion & quat);
+  virtual void SetPosition(const geometry_msgs::Point& origin);
+  virtual void SetOrientation(const geometry_msgs::Quaternion& quat);
 
 private:
   // utils to find useful frustum metadata
-  double Dot(const VectorWithPt3D &, const openvdb::Vec3d &) const;
-  double Dot(const VectorWithPt3D &, const Eigen::Vector3d &) const;
+  double Dot(const VectorWithPt3D&, const openvdb::Vec3d&) const;
+  double Dot(const VectorWithPt3D&, const Eigen::Vector3d&) const;
 
   double _vFOV, _vFOVPadding, _hFOV, _min_d, _max_d;
   double _hFOVhalf;
@@ -82,8 +81,9 @@ private:
   Eigen::Quaterniond _orientation_conjugate;
   bool _valid_frustum;
   bool _full_hFOV;
+
 };
 
-}  // namespace geometry
+} // end namespace
 
-#endif  // SPATIO_TEMPORAL_VOXEL_LAYER__FRUSTUM_MODELS__THREE_DIMENSIONAL_LIDAR_FRUSTUM_HPP_
+#endif
