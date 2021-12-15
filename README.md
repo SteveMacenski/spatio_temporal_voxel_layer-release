@@ -1,4 +1,4 @@
-# Spatio-Temporal Voxel Layer [![Build Status](http://build.ros.org/buildStatus/icon?job=Mdev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64)](http://build.ros.org/view/Kbin_uX64/job/Mdev__spatio_temporal_voxel_layer__ubuntu_bionic_amd64/)
+# Spatio-Temporal Voxel Layer 
 
 This is a drop in replacement for the voxel_grid voxel representation of the environment. This package does a number of things to improve on the voxel grid package and extend the capabilities offered to the users, under a LGPL v2.1 license. Developed and maintained by [Steven Macenski](https://www.linkedin.com/in/steven-macenski-41a985101/) at [Simbe Robotics](http://www.simberobotics.com/).
 
@@ -29,6 +29,8 @@ Steve spoke at ROSCon 2018 about STVL and his presentation is [linked here](http
 [![IMAGE ALT TEXT](https://user-images.githubusercontent.com/14944147/46768837-987c9280-cc9e-11e8-99ea-788d3d590dd8.png)](https://vimeo.com/292699571)
 
 ### Cite This Work
+
+You can find this work [here](https://journals.sagepub.com/doi/10.1177/1729881420910530).
 
 ```
 @article{doi:10.1177/1729881420910530,
@@ -99,7 +101,7 @@ Required dependencies ROS Kinetic, navigation, OpenVDB, TBB.
 
 An example fully-described configuration is shown below.
 
-Note: We supply two PCL filters within STVL to massage the data to lower compute overhead. STVL has an approximate voxel filter to make the data more sparse if very dense. It also has a passthrough filter to limit processing data within the valid minimum to maximum height bounds. The voxel filter is recommended if it lowers CPU overhead, otherwise, passthrough filter. No filter is also available if you pre-process your data or are not interested in performance optimizations.
+Note: We supply two PCL filters within STVL to massage the data to lower compute overhead. STVL has an approximate voxel filter to make the data more sparse if very dense. It also has a passthrough filter to limit processing data within the valid minimum to maximum height bounds. The voxel filter is recommended if it lowers CPU overhead, otherwise, passthrough filter. No filter is also available if you pre-process your data or are not interested in performance optimizations. 
 
 ```
 rgbd_obstacle_layer:
