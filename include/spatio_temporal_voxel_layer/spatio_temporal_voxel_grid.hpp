@@ -62,8 +62,6 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/point32.hpp"
-// TBB
-#include "tbb/parallel_do.h"
 // OpenVDB
 #include "openvdb/openvdb.h"
 #include "openvdb/tools/GridTransformer.h"
@@ -129,7 +127,7 @@ public:
   typedef openvdb::math::Ray<openvdb::Real>::Vec3T Vec3Type;
 
   SpatioTemporalVoxelGrid(
-    std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node,
+    rclcpp::Clock::SharedPtr clock,
     const float & voxel_size, const double & background_value,
     const int & decay_model, const double & voxel_decay,
     const bool & pub_voxels);
@@ -178,8 +176,7 @@ protected:
   openvdb::Vec3d WorldToIndex(const openvdb::Vec3d & coord) const;
   openvdb::Vec3d IndexToWorld(const openvdb::Coord & coord) const;
 
-  // :-( had to break ROS encap. to get time in ros2...
-  std::shared_ptr<rclcpp_lifecycle::LifecycleNode> _node;
+  rclcpp::Clock::SharedPtr _clock;
 
   mutable openvdb::DoubleGrid::Ptr _grid;
   int _decay_model;

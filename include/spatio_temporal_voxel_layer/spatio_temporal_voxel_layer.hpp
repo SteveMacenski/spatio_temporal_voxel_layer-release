@@ -3,6 +3,7 @@
  * Software License Agreement
  *
  *  Copyright (c) 2018, Simbe Robotics, Inc.
+ *  Copyright (c) 2021, Samsung Research America
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,6 +34,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Author: Steve Macenski (steven.macenski@simberobotics.com)
+ *                         stevenmacenski@gmail.com
  * Purpose: Replace the ROS voxel grid / obstacle layers using VoxelGrid
  *          with OpenVDB's more efficient and capacble voxel library with
  *          ray tracing and knn.
@@ -104,6 +106,7 @@ public:
   virtual void activate(void);
   virtual void deactivate(void);
 
+  virtual bool isClearable() {return true;}
 
   // Functions for sensor feeds
   bool GetMarkingObservations(std::vector<observation::MeasurementReading> & marking_observations)
@@ -160,7 +163,7 @@ private:
   std::vector<std::shared_ptr<buffer::MeasurementBuffer>> _clearing_buffers;
   std::vector<rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr> _buffer_enabler_servers;
 
-  bool _publish_voxels, _mapping_mode;
+  bool _publish_voxels, _mapping_mode, was_reset_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _voxel_pub;
   rclcpp::Service<spatio_temporal_voxel_layer::srv::SaveGrid>::SharedPtr _grid_saver;
   std::unique_ptr<rclcpp::Duration> _map_save_duration;
