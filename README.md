@@ -1,3 +1,28 @@
+## spatio_temporal_voxel_layer (humble) - 2.3.0-1
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `humble` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --track humble --rosdistro humble --edit` on `Tue, 23 Apr 2024 21:54:24 -0000`
+
+These packages were released:
+- `openvdb_vendor`
+- `spatio_temporal_voxel_layer`
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `2.3.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## spatio_temporal_voxel_layer (galactic) - 2.2.0-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `galactic` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --track galactic --rosdistro galactic --new-track` on `Wed, 15 Dec 2021 23:19:23 -0000`
