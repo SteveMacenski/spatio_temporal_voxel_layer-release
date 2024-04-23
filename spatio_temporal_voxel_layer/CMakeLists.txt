@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.5)
 project(spatio_temporal_voxel_layer)
 
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
+
+# Get a linker error when there are undefined symbols
+add_link_options(-Wl,--no-undefined)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
@@ -23,12 +26,13 @@ find_package(pcl_conversions REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2_sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(openvdb_vendor REQUIRED)
 
-find_package(OpenVDB REQUIRED)
 remove_definitions(-DDISABLE_LIBUSB-1.0)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -63,8 +67,10 @@ set(dependencies
   rclcpp
   tf2_ros
   tf2_geometry_msgs
+  tf2_sensor_msgs
   visualization_msgs
   builtin_interfaces
+  openvdb_vendor
 )
 
 set(library_name spatio_temporal_voxel_layer_core)
@@ -76,6 +82,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
   DEPENDENCIES builtin_interfaces std_msgs
 )
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 
 include_directories(
     include
@@ -83,7 +90,6 @@ include_directories(
     ${EIGEN3_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
-    ${OpenVDB_INCLUDE_DIR}
 )
 
 add_library(${library_name} SHARED
@@ -95,14 +101,14 @@ add_library(${library_name} SHARED
             src/vdb2pc.cpp
 )
 
-rosidl_target_interfaces(${library_name} ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_link_libraries(${library_name} "${cpp_typesupport_target}")
 target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 target_link_libraries(${library_name}
   ${Boost_LIBRARIES}
   ${EIGEN3_LIBRARIES}
   ${PCL_LIBRARIES}
-  ${OpenVDB_LIBRARIES}
+  OpenVDB::openvdb
 )
 
 ament_target_dependencies(${library_name} ${dependencies})

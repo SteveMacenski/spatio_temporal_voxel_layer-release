@@ -102,6 +102,8 @@ void SpatioTemporalVoxelGrid::ClearFrustums(
 
   // accelerate the decay of voxels interior to the frustum
   if (this->IsGridEmpty()) {
+    _grid_points->clear();
+    _cost_map->clear();
     return;
   }
 
@@ -207,17 +209,18 @@ void SpatioTemporalVoxelGrid::TemporalClearAndGenerateCostmap(
         }
       }
     }
-    
+
     if (cleared_point)
     {
       cleared_cells.insert(occupany_cell(pose_world[0], pose_world[1]));
-    }
-    else
-    {
+    } else {
       // if here, we can add to costmap and PC2
       PopulateCostmapAndPointcloud(pt_index);
     }
   }
+
+  // free memory taken by expired voxels
+  _grid->pruneGrid();
 }
 
 /*****************************************************************************/
@@ -226,7 +229,7 @@ void SpatioTemporalVoxelGrid::PopulateCostmapAndPointcloud(
 /*****************************************************************************/
 {
   // add pt to the pointcloud and costmap
-  openvdb::Vec3d pose_world = _grid->indexToWorld(pt);
+  openvdb::Vec3d pose_world = this->IndexToWorld(pt);
 
   if (_pub_voxels) {
     geometry_msgs::msg::Point32 point;
@@ -286,8 +289,13 @@ void SpatioTemporalVoxelGrid::operator()(
       if (distance_2 > mark_range_2 || distance_2 < 0.0001) {
         continue;
       }
+
+      double x = *iter_x < 0 ? *iter_x - _voxel_size : *iter_x;
+      double y = *iter_y < 0 ? *iter_y - _voxel_size : *iter_y;
+      double z = *iter_y < 0 ? *iter_z - _voxel_size : *iter_z;
+
       openvdb::Vec3d mark_grid(this->WorldToIndex(
-          openvdb::Vec3d(*iter_x, *iter_y, *iter_z)));
+          openvdb::Vec3d(x, y, z)));
 
       if (!this->MarkGridPoint(
           openvdb::Coord(
@@ -386,6 +394,30 @@ bool SpatioTemporalVoxelGrid::ResetGrid(void)
 }
 
 /*****************************************************************************/
+void SpatioTemporalVoxelGrid::ResetGridArea(
+  const occupany_cell & start, const occupany_cell & end, bool invert_area)
+/*****************************************************************************/
+{
+  boost::unique_lock<boost::mutex> lock(_grid_lock);
+
+  openvdb::DoubleGrid::ValueOnCIter cit_grid = _grid->cbeginValueOn();
+  for (cit_grid; cit_grid.test(); ++cit_grid)
+  {
+    const openvdb::Coord pt_index(cit_grid.getCoord());
+    const openvdb::Vec3d pose_world = this->IndexToWorld(pt_index);
+
+    const bool in_x_range = pose_world.x() > start.x && pose_world.x() < end.x;
+    const bool in_y_range = pose_world.y() > start.y && pose_world.y() < end.y;
+    const bool in_range = in_x_range && in_y_range;
+
+    if(in_range == invert_area)
+    {
+      ClearGridPoint(pt_index);
+    }
+  }
+}
+
+/*****************************************************************************/
 bool SpatioTemporalVoxelGrid::MarkGridPoint(
   const openvdb::Coord & pt, const double & value) const
 /*****************************************************************************/
@@ -416,7 +448,15 @@ openvdb::Vec3d SpatioTemporalVoxelGrid::IndexToWorld(
 /*****************************************************************************/
 {
   // Applies tranform stored in getTransform.
-  return _grid->indexToWorld(coord);
+  openvdb::Vec3d pose_world =  _grid->indexToWorld(coord);
+
+  // Using the center for world coordinate
+  const double & center_offset = _voxel_size / 2.0;
+  pose_world[0] += center_offset;
+  pose_world[1] += center_offset;
+  pose_world[2] += center_offset;
+
+  return pose_world;
 }
 
 /*****************************************************************************/

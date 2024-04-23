@@ -49,10 +49,12 @@
 #include <string>
 #include <iostream>
 #include <memory>
+#include <unordered_set>
 // voxel grid
 #include "spatio_temporal_voxel_layer/spatio_temporal_voxel_grid.hpp"
 // ROS
 #include "rclcpp/rclcpp.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 // costmap
 #include "nav2_costmap_2d/layer.hpp"
 #include "nav2_costmap_2d/layered_costmap.hpp"
@@ -72,15 +74,16 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/message_filter.h"
 #include "message_filters/subscriber.h"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tf2/buffer_core.h"
 
 namespace spatio_temporal_voxel_layer
 {
 
 // conveniences for line lengths
-typedef std::vector<std::shared_ptr<message_filters::SubscriberBase>>::iterator
-  observation_subscribers_iter;
+typedef std::vector<
+  std::shared_ptr<message_filters::SubscriberBase<rclcpp_lifecycle::LifecycleNode>>
+  >::iterator observation_subscribers_iter;
 typedef std::vector<std::shared_ptr<buffer::MeasurementBuffer>>::iterator observation_buffers_iter;
 
 // Core ROS voxel layer class
@@ -105,6 +108,7 @@ public:
   virtual void reset(void);
   virtual void activate(void);
   virtual void deactivate(void);
+  virtual void clearArea(int start_x, int start_y, int end_x, int end_y, bool invert_area=false) override;
 
   virtual bool isClearable() {return true;}
 
@@ -147,16 +151,24 @@ private:
   bool RemoveStaticObservations(void);
 
   // Enable/Disable callback
-  void BufferEnablerCallback(
-    const std::shared_ptr<rmw_request_id_t> request_header,
+  void BufferEnablerCallback(const std::shared_ptr<rmw_request_id_t> request_header,
     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
     std::shared_ptr<std_srvs::srv::SetBool::Response> response,
     const std::shared_ptr<buffer::MeasurementBuffer> buffer,
-    const std::shared_ptr<message_filters::SubscriberBase> & subcriber);
+    const std::shared_ptr<message_filters::SubscriberBase<rclcpp_lifecycle::LifecycleNode>>
+      & subcriber
+    );
 
+  /**
+   * @brief Callback executed when a paramter change is detected
+   * @param parameters list of changed parameters
+   */
+  rcl_interfaces::msg::SetParametersResult
+    dynamicParametersCallback(std::vector<rclcpp::Parameter> parameters);
 
   laser_geometry::LaserProjection _laser_projector;
-  std::vector<std::shared_ptr<message_filters::SubscriberBase>> _observation_subscribers;
+  std::vector<std::shared_ptr<message_filters::SubscriberBase<rclcpp_lifecycle::LifecycleNode>>>
+    _observation_subscribers;
   std::vector<std::shared_ptr<tf2_ros::MessageFilterBase>> _observation_notifiers;
   std::vector<std::shared_ptr<buffer::MeasurementBuffer>> _observation_buffers;
   std::vector<std::shared_ptr<buffer::MeasurementBuffer>> _marking_buffers;
@@ -177,6 +189,11 @@ private:
   std::vector<observation::MeasurementReading> _static_observations;
   std::unique_ptr<volume_grid::SpatioTemporalVoxelGrid> _voxel_grid;
   boost::recursive_mutex _voxel_grid_lock;
+
+  std::string _topics_string;
+
+  // Dynamic parameters handler
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr dyn_params_handler;
 };
 
 }  // namespace spatio_temporal_voxel_layer
