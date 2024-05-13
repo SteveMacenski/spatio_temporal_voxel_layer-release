@@ -1,0 +1,12 @@
+Source: ros-humble-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: Steve Macenski <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libopenexr-dev, libpcl-apps1.12, libpcl-common1.12, libpcl-features1.12, libpcl-filters1.12, libpcl-io1.12, libpcl-kdtree1.12, libpcl-keypoints1.12, libpcl-ml1.12, libpcl-octree1.12, libpcl-outofcore1.12, libpcl-people1.12, libpcl-recognition1.12, libpcl-registration1.12, libpcl-sample-consensus1.12, libpcl-search1.12, libpcl-segmentation1.12, libpcl-stereo1.12, libpcl-surface1.12, libpcl-tracking1.12, libpcl-visualization1.12, ros-humble-ament-cmake, ros-humble-ament-lint-auto <!nocheck>, ros-humble-builtin-interfaces, ros-humble-geometry-msgs, ros-humble-laser-geometry, ros-humble-message-filters, ros-humble-nav2-costmap-2d, ros-humble-openvdb-vendor, ros-humble-pcl-conversions, ros-humble-pluginlib, ros-humble-rclcpp, ros-humble-rosidl-default-generators, ros-humble-sensor-msgs, ros-humble-std-msgs, ros-humble-std-srvs, ros-humble-tf2-geometry-msgs, ros-humble-tf2-ros, ros-humble-tf2-sensor-msgs, ros-humble-visualization-msgs, ros-humble-ros-workspace, ros-humble-rosidl-typesupport-fastrtps-c, ros-humble-rosidl-typesupport-fastrtps-cpp
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-humble-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopenexr-dev, libpcl-apps1.12, libpcl-common1.12, libpcl-features1.12, libpcl-filters1.12, libpcl-io1.12, libpcl-kdtree1.12, libpcl-keypoints1.12, libpcl-ml1.12, libpcl-octree1.12, libpcl-outofcore1.12, libpcl-people1.12, libpcl-recognition1.12, libpcl-registration1.12, libpcl-sample-consensus1.12, libpcl-search1.12, libpcl-segmentation1.12, libpcl-stereo1.12, libpcl-surface1.12, libpcl-tracking1.12, libpcl-visualization1.12, ros-humble-builtin-interfaces, ros-humble-geometry-msgs, ros-humble-laser-geometry, ros-humble-message-filters, ros-humble-nav2-costmap-2d, ros-humble-openvdb-vendor, ros-humble-pcl-conversions, ros-humble-pluginlib, ros-humble-rclcpp, ros-humble-rosidl-default-runtime, ros-humble-sensor-msgs, ros-humble-std-msgs, ros-humble-std-srvs, ros-humble-tf2-geometry-msgs, ros-humble-tf2-ros, ros-humble-tf2-sensor-msgs, ros-humble-visualization-msgs, ros-humble-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
