@@ -1,0 +1,12 @@
+Source: ros-iron-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: Steve Macenski <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libopenexr-dev, libpcl-apps1.12, libpcl-common1.12, libpcl-features1.12, libpcl-filters1.12, libpcl-io1.12, libpcl-kdtree1.12, libpcl-keypoints1.12, libpcl-ml1.12, libpcl-octree1.12, libpcl-outofcore1.12, libpcl-people1.12, libpcl-recognition1.12, libpcl-registration1.12, libpcl-sample-consensus1.12, libpcl-search1.12, libpcl-segmentation1.12, libpcl-stereo1.12, libpcl-surface1.12, libpcl-tracking1.12, libpcl-visualization1.12, ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-builtin-interfaces, ros-iron-geometry-msgs, ros-iron-laser-geometry, ros-iron-message-filters, ros-iron-nav2-costmap-2d, ros-iron-openvdb-vendor, ros-iron-pcl-conversions, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-rosidl-default-generators, ros-iron-sensor-msgs, ros-iron-std-msgs, ros-iron-std-srvs, ros-iron-tf2-geometry-msgs, ros-iron-tf2-ros, ros-iron-tf2-sensor-msgs, ros-iron-visualization-msgs, ros-iron-ros-workspace, ros-iron-rosidl-typesupport-fastrtps-c, ros-iron-rosidl-typesupport-fastrtps-cpp
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopenexr-dev, libpcl-apps1.12, libpcl-common1.12, libpcl-features1.12, libpcl-filters1.12, libpcl-io1.12, libpcl-kdtree1.12, libpcl-keypoints1.12, libpcl-ml1.12, libpcl-octree1.12, libpcl-outofcore1.12, libpcl-people1.12, libpcl-recognition1.12, libpcl-registration1.12, libpcl-sample-consensus1.12, libpcl-search1.12, libpcl-segmentation1.12, libpcl-stereo1.12, libpcl-surface1.12, libpcl-tracking1.12, libpcl-visualization1.12, ros-iron-builtin-interfaces, ros-iron-geometry-msgs, ros-iron-laser-geometry, ros-iron-message-filters, ros-iron-nav2-costmap-2d, ros-iron-openvdb-vendor, ros-iron-pcl-conversions, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-rosidl-default-runtime, ros-iron-sensor-msgs, ros-iron-std-msgs, ros-iron-std-srvs, ros-iron-tf2-geometry-msgs, ros-iron-tf2-ros, ros-iron-tf2-sensor-msgs, ros-iron-visualization-msgs, ros-iron-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
