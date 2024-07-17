@@ -1,3 +1,28 @@
+## spatio_temporal_voxel_layer (jazzy) - 2.5.0-1
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --ros-distro jazzy --track jazzy --edit` on `Wed, 17 Jul 2024 16:54:04 -0000`
+
+These packages were released:
+- `openvdb_vendor`
+- `spatio_temporal_voxel_layer`
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `2.5.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.24.0`
+- rosdistro version: `0.9.1`
+- vcstools version: `0.1.42`
+
+
 ## spatio_temporal_voxel_layer (iron) - 2.4.0-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `iron` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --track iron --rosdistro iron` on `Tue, 14 May 2024 17:09:16 -0000`
