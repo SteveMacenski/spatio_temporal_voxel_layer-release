@@ -144,7 +144,7 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
   sub_opt.callback_group = callback_group_;
 
   auto pub_opt = rclcpp::PublisherOptions();
-  sub_opt.callback_group = callback_group_;
+  pub_opt.callback_group = callback_group_;
 
   _voxel_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>(
     "voxel_grid", rclcpp::QoS(1), pub_opt);
