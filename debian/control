@@ -1,0 +1,12 @@
+Source: ros-jazzy-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: Steve Macenski <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libopenexr-dev, libpcl-dev, ros-jazzy-ament-cmake, ros-jazzy-ament-lint-auto <!nocheck>, ros-jazzy-builtin-interfaces, ros-jazzy-geometry-msgs, ros-jazzy-laser-geometry, ros-jazzy-message-filters, ros-jazzy-nav2-costmap-2d, ros-jazzy-openvdb-vendor, ros-jazzy-pcl-conversions, ros-jazzy-pluginlib, ros-jazzy-rclcpp, ros-jazzy-rosidl-default-generators, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-std-srvs, ros-jazzy-tf2-geometry-msgs, ros-jazzy-tf2-ros, ros-jazzy-tf2-sensor-msgs, ros-jazzy-visualization-msgs, ros-jazzy-ros-workspace, ros-jazzy-rosidl-typesupport-fastrtps-c, ros-jazzy-rosidl-typesupport-fastrtps-cpp
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopenexr-dev, libpcl-dev, ros-jazzy-builtin-interfaces, ros-jazzy-geometry-msgs, ros-jazzy-laser-geometry, ros-jazzy-message-filters, ros-jazzy-nav2-costmap-2d, ros-jazzy-openvdb-vendor, ros-jazzy-pcl-conversions, ros-jazzy-pluginlib, ros-jazzy-rclcpp, ros-jazzy-rosidl-default-runtime, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-std-srvs, ros-jazzy-tf2-geometry-msgs, ros-jazzy-tf2-ros, ros-jazzy-tf2-sensor-msgs, ros-jazzy-visualization-msgs, ros-jazzy-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
