@@ -218,7 +218,7 @@ void MeasurementBuffer::RemoveStaleObservations(void)
   }
 
   for (it = _observation_list.begin(); it != _observation_list.end(); ++it) {
-    const rclcpp::Duration time_diff = _last_updated - it->_cloud->header.stamp;
+    const rclcpp::Duration time_diff = clock_->now() - it->_cloud->header.stamp;
 
     if (time_diff > _observation_keep_time) {
       _observation_list.erase(it, _observation_list.end());
