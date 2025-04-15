@@ -122,7 +122,7 @@ void SpatioTemporalVoxelGrid::ClearFrustums(
   std::vector<observation::MeasurementReading>::const_iterator it =
     clearing_readings.begin();
   for (; it != clearing_readings.end(); ++it) {
-    geometry::Frustum * frustum;
+    geometry::Frustum * frustum = nullptr;
     if (it->_model_type == DEPTH_CAMERA) {
       frustum = new geometry::DepthCameraFrustum(
         it->_vertical_fov_in_rad,
@@ -401,7 +401,7 @@ void SpatioTemporalVoxelGrid::ResetGridArea(
   boost::unique_lock<boost::mutex> lock(_grid_lock);
 
   openvdb::DoubleGrid::ValueOnCIter cit_grid = _grid->cbeginValueOn();
-  for (cit_grid; cit_grid.test(); ++cit_grid)
+  for (; cit_grid.test(); ++cit_grid)
   {
     const openvdb::Coord pt_index(cit_grid.getCoord());
     const openvdb::Vec3d pose_world = this->IndexToWorld(pt_index);
@@ -410,7 +410,7 @@ void SpatioTemporalVoxelGrid::ResetGridArea(
     const bool in_y_range = pose_world.y() > start.y && pose_world.y() < end.y;
     const bool in_range = in_x_range && in_y_range;
 
-    if(in_range == invert_area)
+    if(in_range != invert_area)
     {
       ClearGridPoint(pt_index);
     }
