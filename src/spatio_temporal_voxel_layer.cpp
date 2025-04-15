@@ -146,13 +146,16 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
   auto pub_opt = rclcpp::PublisherOptions();
   pub_opt.callback_group = callback_group_;
 
-  _voxel_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>(
-    "voxel_grid", rclcpp::QoS(1), pub_opt);
+  if(_publish_voxels)
+  {
+    _voxel_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>(
+      "voxel_grid", rclcpp::QoS(1), pub_opt);
+  }
 
   auto save_grid_callback = std::bind(
     &SpatioTemporalVoxelLayer::SaveGridCallback, this, _1, _2, _3);
   _grid_saver = node->create_service<spatio_temporal_voxel_layer::srv::SaveGrid>(
-    "save_grid", save_grid_callback, rmw_qos_profile_services_default, callback_group_);
+    "save_grid", save_grid_callback, rclcpp::SystemDefaultsQoS(), callback_group_);
 
   _voxel_grid = std::make_unique<volume_grid::SpatioTemporalVoxelGrid>(
     node->get_clock(), _voxel_size, static_cast<double>(default_value_), _decay_model,
@@ -331,7 +334,6 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
       _observation_subscribers.push_back(sub);
       _observation_notifiers.push_back(filter);
     }
-
     std::function<void(const std::shared_ptr<rmw_request_id_t>,
       std_srvs::srv::SetBool::Request::SharedPtr,
       std_srvs::srv::SetBool::Response::SharedPtr)> toggle_srv_callback;
@@ -342,7 +344,7 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
       _observation_subscribers.back());
     std::string toggle_topic = source + "/toggle_enabled";
     auto server = node->create_service<std_srvs::srv::SetBool>(
-      toggle_topic, toggle_srv_callback, rmw_qos_profile_services_default, callback_group_);
+      toggle_topic, toggle_srv_callback, rclcpp::SystemDefaultsQoS(), callback_group_);
 
     _buffer_enabler_servers.push_back(server);
 
