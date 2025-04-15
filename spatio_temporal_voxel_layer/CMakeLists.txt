@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(spatio_temporal_voxel_layer)
 
 if(NOT WIN32)
@@ -79,9 +79,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 )
 rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 
-# Get a linker error when there are undefined symbols
-add_link_options(-Wl,--no-undefined)
-
 include_directories(
     include
     ${BOOST_INCLUDE_DIRS}
@@ -109,6 +106,9 @@ target_link_libraries(${library_name}
   OpenVDB::openvdb
 )
 
+# Get a linker error when there are undefined symbols
+target_link_options(${library_name} PRIVATE -Wl,--no-undefined)
+
 ament_target_dependencies(${library_name} ${dependencies})
 
 if(BUILD_TESTING)
@@ -133,5 +133,5 @@ install(FILES costmap_plugins.xml
 ament_export_dependencies(rosidl_default_runtime)
 pluginlib_export_plugin_description_file(nav2_costmap_2d costmap_plugins.xml)
 ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_libraries(${library_name})
 ament_package()
