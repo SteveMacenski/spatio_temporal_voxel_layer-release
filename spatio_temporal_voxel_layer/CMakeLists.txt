@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.5)
 project(spatio_temporal_voxel_layer)
 
 if(NOT WIN32)
@@ -8,6 +8,9 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
+
+# Get a linker error when there are undefined symbols
+add_link_options(-Wl,--no-undefined)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
@@ -72,6 +75,8 @@ set(dependencies
 
 set(library_name spatio_temporal_voxel_layer_core)
 
+add_definitions(${EIGEN3_DEFINITIONS})
+
 set(srv_files "srv/SaveGrid.srv")
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
@@ -106,9 +111,6 @@ target_link_libraries(${library_name}
   OpenVDB::openvdb
 )
 
-# Get a linker error when there are undefined symbols
-target_link_options(${library_name} PRIVATE -Wl,--no-undefined)
-
 ament_target_dependencies(${library_name} ${dependencies})
 
 if(BUILD_TESTING)
@@ -133,5 +135,5 @@ install(FILES costmap_plugins.xml
 ament_export_dependencies(rosidl_default_runtime)
 pluginlib_export_plugin_description_file(nav2_costmap_2d costmap_plugins.xml)
 ament_export_include_directories(include)
-ament_export_libraries(${library_name})
+ament_export_libraries(${PROJECT_NAME})
 ament_package()
