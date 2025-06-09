@@ -1,0 +1,12 @@
+Source: ros-kilted-openvdb-vendor
+Section: misc
+Priority: optional
+Maintainer: Tim Clephas <tim.clephas@nobleo.nl>
+Build-Depends: debhelper (>= 9.0.0), git, libboost-thread-dev, libtbb-dev, ros-kilted-ament-cmake, ros-kilted-ament-cmake-vendor-package, zlib1g-dev, ros-kilted-ros-workspace
+Homepage: https://github.com/AcademySoftwareFoundation/openvdb
+Standards-Version: 3.9.2
+
+Package: ros-kilted-openvdb-vendor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-thread-dev, libtbb-dev, zlib1g-dev, ros-kilted-ros-workspace
+Description: Wrapper around OpenVDB, if not found on the system, will compile from source
