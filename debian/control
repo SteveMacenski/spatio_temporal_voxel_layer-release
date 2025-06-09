@@ -1,0 +1,12 @@
+Source: ros-kilted-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: Steve Macenski <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libopenexr-dev, libpcl-apps1.13, libpcl-common1.13, libpcl-features1.13, libpcl-filters1.13, libpcl-io1.13, libpcl-kdtree1.13, libpcl-keypoints1.13, libpcl-ml1.13, libpcl-octree1.13, libpcl-outofcore1.13, libpcl-people1.13, libpcl-recognition1.13, libpcl-registration1.13, libpcl-sample-consensus1.13, libpcl-search1.13, libpcl-segmentation1.13, libpcl-stereo1.13, libpcl-surface1.13, libpcl-tracking1.13, libpcl-visualization1.13, ros-kilted-ament-cmake, ros-kilted-ament-lint-auto <!nocheck>, ros-kilted-builtin-interfaces, ros-kilted-geometry-msgs, ros-kilted-laser-geometry, ros-kilted-message-filters, ros-kilted-nav2-costmap-2d, ros-kilted-openvdb-vendor, ros-kilted-pcl-conversions, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-rosidl-default-generators, ros-kilted-sensor-msgs, ros-kilted-std-msgs, ros-kilted-std-srvs, ros-kilted-tf2-geometry-msgs, ros-kilted-tf2-ros, ros-kilted-tf2-sensor-msgs, ros-kilted-visualization-msgs, ros-kilted-ros-workspace, ros-kilted-rosidl-typesupport-fastrtps-c, ros-kilted-rosidl-typesupport-fastrtps-cpp
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopenexr-dev, libpcl-apps1.13, libpcl-common1.13, libpcl-features1.13, libpcl-filters1.13, libpcl-io1.13, libpcl-kdtree1.13, libpcl-keypoints1.13, libpcl-ml1.13, libpcl-octree1.13, libpcl-outofcore1.13, libpcl-people1.13, libpcl-recognition1.13, libpcl-registration1.13, libpcl-sample-consensus1.13, libpcl-search1.13, libpcl-segmentation1.13, libpcl-stereo1.13, libpcl-surface1.13, libpcl-tracking1.13, libpcl-visualization1.13, ros-kilted-builtin-interfaces, ros-kilted-geometry-msgs, ros-kilted-laser-geometry, ros-kilted-message-filters, ros-kilted-nav2-costmap-2d, ros-kilted-openvdb-vendor, ros-kilted-pcl-conversions, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-rosidl-default-runtime, ros-kilted-sensor-msgs, ros-kilted-std-msgs, ros-kilted-std-srvs, ros-kilted-tf2-geometry-msgs, ros-kilted-tf2-ros, ros-kilted-tf2-sensor-msgs, ros-kilted-visualization-msgs, ros-kilted-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
