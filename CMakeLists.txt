@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(spatio_temporal_voxel_layer)
 
 if(NOT WIN32)
@@ -8,9 +8,6 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-
-# Get a linker error when there are undefined symbols
-add_link_options(-Wl,--no-undefined)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
@@ -75,8 +72,6 @@ set(dependencies
 
 set(library_name spatio_temporal_voxel_layer_core)
 
-add_definitions(${EIGEN3_DEFINITIONS})
-
 set(srv_files "srv/SaveGrid.srv")
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
@@ -90,6 +85,7 @@ include_directories(
     ${EIGEN3_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
+    ${pcl_conversions_INCLUDE_DIRS}
 )
 
 add_library(${library_name} SHARED
@@ -109,9 +105,20 @@ target_link_libraries(${library_name}
   ${EIGEN3_LIBRARIES}
   ${PCL_LIBRARIES}
   OpenVDB::openvdb
+  rclcpp::rclcpp
+  ${geometry_msgs_TARGETS}
+  rclcpp_lifecycle::rclcpp_lifecycle
+  ${sensor_msgs_TARGETS}
+  ${visualization_msgs_TARGETS}
+  tf2_ros::tf2_ros
+  tf2_geometry_msgs::tf2_geometry_msgs
+  tf2_sensor_msgs::tf2_sensor_msgs
+  nav2_costmap_2d::nav2_costmap_2d_core
+  laser_geometry::laser_geometry
 )
 
-ament_target_dependencies(${library_name} ${dependencies})
+# Get a linker error when there are undefined symbols
+target_link_options(${library_name} PRIVATE -Wl,--no-undefined)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -135,5 +142,5 @@ install(FILES costmap_plugins.xml
 ament_export_dependencies(rosidl_default_runtime)
 pluginlib_export_plugin_description_file(nav2_costmap_2d costmap_plugins.xml)
 ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_libraries(${library_name})
 ament_package()
