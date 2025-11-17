@@ -119,6 +119,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
   // decay param
   declareParameter("voxel_decay", rclcpp::ParameterValue(-1.0));
   node->get_parameter(name_ + ".voxel_decay", _voxel_decay);
+  // distance decay param
+  declareParameter("voxel_distance_decay", rclcpp::ParameterValue(-1.0));
+  node->get_parameter(name_ + ".voxel_distance_decay", _voxel_distance_decay);
   // whether to map or navigate
   declareParameter("mapping_mode", rclcpp::ParameterValue(false));
   node->get_parameter(name_ + ".mapping_mode", _mapping_mode);
@@ -144,19 +147,22 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
   sub_opt.callback_group = callback_group_;
 
   auto pub_opt = rclcpp::PublisherOptions();
-  sub_opt.callback_group = callback_group_;
+  pub_opt.callback_group = callback_group_;
 
-  _voxel_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>(
-    "voxel_grid", rclcpp::QoS(1), pub_opt);
+  if(_publish_voxels)
+  {
+    _voxel_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>(
+      "voxel_grid", rclcpp::QoS(1), pub_opt);
+  }
 
   auto save_grid_callback = std::bind(
     &SpatioTemporalVoxelLayer::SaveGridCallback, this, _1, _2, _3);
   _grid_saver = node->create_service<spatio_temporal_voxel_layer::srv::SaveGrid>(
-    "save_grid", save_grid_callback, rmw_qos_profile_services_default, callback_group_);
+    "save_grid", save_grid_callback, rclcpp::SystemDefaultsQoS(), callback_group_);
 
   _voxel_grid = std::make_unique<volume_grid::SpatioTemporalVoxelGrid>(
     node->get_clock(), _voxel_size, static_cast<double>(default_value_), _decay_model,
-    _voxel_decay, _publish_voxels);
+    _voxel_decay, _voxel_distance_decay, _publish_voxels);
 
   matchSize();
 
@@ -258,6 +264,8 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
               "Only topics that use pointclouds or laser scans are supported.");
     }
 
+    topic = joinWithParentNamespace(topic);
+
     // create an observation buffer
     _observation_buffers.push_back(
       std::shared_ptr<buffer::MeasurementBuffer>(
@@ -342,7 +350,7 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
       _observation_subscribers.back());
     std::string toggle_topic = source + "/toggle_enabled";
     auto server = node->create_service<std_srvs::srv::SetBool>(
-      toggle_topic, toggle_srv_callback, rmw_qos_profile_services_default, callback_group_);
+      toggle_topic, toggle_srv_callback, rclcpp::SystemDefaultsQoS(), callback_group_);
 
     _buffer_enabler_servers.push_back(server);
 
@@ -772,7 +780,10 @@ void SpatioTemporalVoxelLayer::updateBounds(
     should_save = node->now() - _last_map_save_time > *_map_save_duration;
   }
   if (!_mapping_mode) {
-    _voxel_grid->ClearFrustums(clearing_observations, cleared_cells);
+    openvdb::Vec3d robot_pose_world;
+    robot_pose_world[0] = robot_x;
+    robot_pose_world[1] = robot_y;
+    _voxel_grid->ClearFrustums(clearing_observations, cleared_cells, robot_pose_world);
   } else if (should_save) {
     _last_map_save_time = node->now();
     time_t rawtime;
@@ -956,8 +967,8 @@ void SpatioTemporalVoxelLayer::clearArea(
   // convert map coords to world coords
   volume_grid::occupany_cell start_world(0, 0);
   volume_grid::occupany_cell end_world(0, 0);
-  mapToWorld(start_x, start_y, start_world.x, start_world.y);
-  mapToWorld(end_x, end_y, end_world.x, end_world.y);
+  mapToWorldNoBounds(start_x, start_y, start_world.x, start_world.y);
+  mapToWorldNoBounds(end_x, end_y, end_world.x, end_world.y);
 
   boost::recursive_mutex::scoped_lock lock(_voxel_grid_lock);
   _voxel_grid->ResetGridArea(start_world, end_world, invert_area);
