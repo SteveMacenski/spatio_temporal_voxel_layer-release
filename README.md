@@ -1,3 +1,28 @@
+## spatio_temporal_voxel_layer (kilted) - 2.6.0-1
+
+The packages in the `spatio_temporal_voxel_layer` repository were released into the `kilted` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --ros-distro kilted --track kilted` on `Mon, 17 Nov 2025 22:08:25 -0000`
+
+These packages were released:
+- `openvdb_vendor`
+- `spatio_temporal_voxel_layer`
+
+Version of package(s) in repository `spatio_temporal_voxel_layer`:
+
+- upstream repository: https://github.com/SteveMacenski/spatio_temporal_voxel_layer.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `2.3.0-1`
+- new version: `2.6.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## spatio_temporal_voxel_layer (kilted) - 2.3.0-1
 
 The packages in the `spatio_temporal_voxel_layer` repository were released into the `kilted` distro by running `/usr/bin/bloom-release spatio_temporal_voxel_layer --rosdistro kilted --track kilted --edit --new-track` on `Mon, 09 Jun 2025 19:46:14 -0000`
