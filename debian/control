@@ -1,0 +1,12 @@
+Source: ros-lyrical-spatio-temporal-voxel-layer
+Section: misc
+Priority: optional
+Maintainer: "Steve Macenski" <stevenmacenski@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libopenexr-dev, libpcl-dev, ros-lyrical-ament-cmake, ros-lyrical-ament-lint-auto <!nocheck>, ros-lyrical-builtin-interfaces, ros-lyrical-geometry-msgs, ros-lyrical-laser-geometry, ros-lyrical-message-filters, ros-lyrical-nav2-costmap-2d, ros-lyrical-nav2-ros-common, ros-lyrical-openvdb-vendor, ros-lyrical-pcl-conversions, ros-lyrical-pluginlib, ros-lyrical-point-cloud-transport, ros-lyrical-point-cloud-transport-plugins, ros-lyrical-rclcpp, ros-lyrical-rosidl-default-generators, ros-lyrical-sensor-msgs, ros-lyrical-std-msgs, ros-lyrical-std-srvs, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-ros, ros-lyrical-tf2-sensor-msgs, ros-lyrical-visualization-msgs, ros-lyrical-ros-workspace, ros-lyrical-rosidl-typesupport-fastrtps-c, ros-lyrical-rosidl-typesupport-fastrtps-cpp
+Homepage: https://index.ros.org/p/spatio_temporal_voxel_layer/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-spatio-temporal-voxel-layer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libopenexr-dev, libpcl-dev, ros-lyrical-builtin-interfaces, ros-lyrical-geometry-msgs, ros-lyrical-laser-geometry, ros-lyrical-message-filters, ros-lyrical-nav2-costmap-2d, ros-lyrical-nav2-ros-common, ros-lyrical-openvdb-vendor, ros-lyrical-pcl-conversions, ros-lyrical-pluginlib, ros-lyrical-point-cloud-transport, ros-lyrical-point-cloud-transport-plugins, ros-lyrical-rclcpp, ros-lyrical-rosidl-default-runtime, ros-lyrical-sensor-msgs, ros-lyrical-std-msgs, ros-lyrical-std-srvs, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-ros, ros-lyrical-tf2-sensor-msgs, ros-lyrical-visualization-msgs, ros-lyrical-ros-workspace
+Description: The spatio-temporal 3D obstacle costmap package
