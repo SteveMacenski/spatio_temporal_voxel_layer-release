@@ -44,6 +44,7 @@
 #include <list>
 #include <string>
 #include <chrono>
+#include <mutex>
 #include <memory>
 // measurement structs
 #include "spatio_temporal_voxel_layer/measurement_reading.h"
@@ -56,15 +57,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 // TF
-#include "tf2_ros/buffer.h"
+#include "nav2_ros_common/tf2_factories.hpp"
 #include "message_filters/subscriber.hpp"
 // msgs
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
-// Mutex
-#include "boost/thread.hpp"
 
 namespace buffer
 {
@@ -92,13 +91,14 @@ public:
     const double & min_obstacle_height,
     const double & max_obstacle_height,
     const double & obstacle_range,
-    tf2_ros::Buffer & tf,
+    nav2::TransformBuffer & tf,
     const std::string & global_frame,
     const std::string & sensor_frame,
     const double & tf_tolerance,
     const double & min_d,
     const double & max_d,
     const double & vFOV,
+    const double & vFOVOffset,
     const double & vFOVPadding,
     const double & hFOV,
     const double & decay_acceleration,
@@ -133,6 +133,7 @@ public:
   void SetMaxObstacleHeight(const double & max_obstacle_height);
   void SetMinZ(const double & min_z);
   void SetMaxZ(const double & max_z);
+  void SetVerticalFovOffset(const double & vertical_fov_offset);
   void SetVerticalFovPadding(const double & vertical_fov_padding);
   void SetHorizontalFovAngle(const double & horizontal_fov_angle);
   void SetVerticalFovAngle(const double & vertical_fov_angle);
@@ -151,14 +152,14 @@ private:
   // Removing old observations from buffer
   void RemoveStaleObservations(void);
 
-  tf2_ros::Buffer & _buffer;
+  nav2::TransformBuffer & _buffer;
   const rclcpp::Duration _observation_keep_time, _expected_update_rate;
   rclcpp::Time _last_updated;
-  boost::recursive_mutex _lock;
+  std::recursive_mutex _lock;
   std::string _global_frame, _sensor_frame, _source_name, _topic_name;
   std::list<observation::MeasurementReading> _observation_list;
   double _min_obstacle_height, _max_obstacle_height, _obstacle_range, _tf_tolerance;
-  double _min_z, _max_z, _vertical_fov, _vertical_fov_padding, _horizontal_fov;
+  double _min_z, _max_z, _vertical_fov, _vertical_fov_offset, _vertical_fov_padding, _horizontal_fov;
   double _decay_acceleration, _voxel_size;
   bool _marking, _clearing;
   Filters _filter;

@@ -107,7 +107,7 @@ Note: We supply two PCL filters within STVL to massage the data to lower compute
 rgbd_obstacle_layer:
   enabled:               true
   voxel_decay:           20     #seconds if linear, e^n if exponential
-  decay_model:           0      #0=linear, 1=exponential, -1=persistent
+  decay_model:           0      #0=linear, 1=exponential, 2=persistent
   voxel_size:            0.05   #meters
   track_unknown_space:   true   #default space is unknown
   observation_persistence: 0.0  #seconds
@@ -125,6 +125,7 @@ rgbd_obstacle_layer:
   rgbd1_mark:
     data_type: PointCloud2
     topic: camera1/depth/points
+    transport_type: "raw"        #default raw -No compression-, Options: zlib, draco, zstd
     marking: true
     clearing: false
     min_obstacle_height: 0.3     #default 0, meters
@@ -139,11 +140,13 @@ rgbd_obstacle_layer:
     enabled: true                #default true, can be toggled on/off with associated service call
     data_type: PointCloud2
     topic: camera1/depth/points
+    transport_type: "raw"        #default raw -No compression-, Options: zlib, draco, zstd
     marking: false
     clearing: true
     min_z: 0.1                   #default 0, meters
     max_z: 7.0                   #default 10, meters
     vertical_fov_angle: 0.7      #default 0.7, radians
+    vertical_fov_offset: 0.0     # default 0, radians. 3D Lidar only. Offset from planar axis. f.e. MID360 has a vFOV of -7deg to 52deg => offset +22.5deg (0.3927 rad)
     horizontal_fov_angle: 1.04   #default 1.04, radians
     decay_acceleration: 1.       #default 0, 1/s^2. If laser scanner MUST be 0
     model_type: 0                #default 0 (depth camera). Use 1 for 3D Lidar

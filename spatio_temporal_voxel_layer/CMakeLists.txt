@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 project(spatio_temporal_voxel_layer)
 
 if(NOT WIN32)
@@ -22,6 +22,7 @@ find_package(message_filters REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(nav2_ros_common REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -29,10 +30,10 @@ find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(openvdb_vendor REQUIRED)
+find_package(point_cloud_transport REQUIRED)
 
 remove_definitions(-DDISABLE_LIBUSB-1.0)
 find_package(Eigen3 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system thread)
 
 find_package(PCL REQUIRED COMPONENTS filters common)
 if(NOT "${PCL_LIBRARIES}" STREQUAL "")
@@ -68,6 +69,7 @@ set(dependencies
   visualization_msgs
   builtin_interfaces
   openvdb_vendor
+  point_cloud_transport
 )
 
 set(library_name spatio_temporal_voxel_layer_core)
@@ -81,10 +83,8 @@ rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_t
 
 include_directories(
     include
-    ${BOOST_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
     ${pcl_conversions_INCLUDE_DIRS}
 )
 
@@ -98,28 +98,33 @@ add_library(${library_name} SHARED
 )
 
 target_link_libraries(${library_name} "${cpp_typesupport_target}")
-target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 target_link_libraries(${library_name}
-  ${Boost_LIBRARIES}
   ${EIGEN3_LIBRARIES}
   ${PCL_LIBRARIES}
   OpenVDB::openvdb
   rclcpp::rclcpp
-  ${geometry_msgs_TARGETS}
+  geometry_msgs::geometry_msgs
   rclcpp_lifecycle::rclcpp_lifecycle
-  ${sensor_msgs_TARGETS}
-  ${visualization_msgs_TARGETS}
+  sensor_msgs::sensor_msgs
+  visualization_msgs::visualization_msgs
   tf2_ros::tf2_ros
   tf2_geometry_msgs::tf2_geometry_msgs
   tf2_sensor_msgs::tf2_sensor_msgs
   nav2_costmap_2d::nav2_costmap_2d_core
   laser_geometry::laser_geometry
   pcl_conversions::pcl_conversions
+  nav2_ros_common::nav2_ros_common
+  point_cloud_transport::point_cloud_transport
 )
 
 # Get a linker error when there are undefined symbols
-target_link_options(${library_name} PRIVATE -Wl,--no-undefined)
+if(APPLE)
+  # macOS linker flag for AppleClang
+  target_link_options(${library_name} PRIVATE -Wl,-undefined,error)
+else()
+  target_link_options(${library_name} PRIVATE -Wl,--no-undefined)
+endif()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

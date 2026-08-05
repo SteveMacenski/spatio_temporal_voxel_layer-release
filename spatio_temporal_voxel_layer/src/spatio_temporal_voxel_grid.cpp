@@ -100,7 +100,7 @@ void SpatioTemporalVoxelGrid::ClearFrustums(
   std::unordered_set<occupany_cell> & cleared_cells, openvdb::Vec3d & robot_pose_world)
 /*****************************************************************************/
 {
-  boost::unique_lock<boost::mutex> lock(_grid_lock);
+  std::unique_lock<std::mutex> lock(_grid_lock);
 
   // accelerate the decay of voxels interior to the frustum
   if (this->IsGridEmpty()) {
@@ -131,7 +131,7 @@ void SpatioTemporalVoxelGrid::ClearFrustums(
         it->_horizontal_fov_in_rad, it->_min_z_in_m, it->_max_z_in_m);
     } else if (it->_model_type == THREE_DIMENSIONAL_LIDAR) {
       frustum = new geometry::ThreeDimensionalLidarFrustum(
-        it->_vertical_fov_in_rad, it->_vertical_fov_padding_in_m,
+        it->_vertical_fov_in_rad, it->_vertical_fov_offset_in_rad, it->_vertical_fov_padding_in_m,
         it->_horizontal_fov_in_rad, it->_min_z_in_m, it->_max_z_in_m);
     } else {
       // add else if statement for each implemented model
@@ -276,7 +276,7 @@ void SpatioTemporalVoxelGrid::Mark(
   const std::vector<observation::MeasurementReading> & marking_readings)
 /*****************************************************************************/
 {
-  boost::unique_lock<boost::mutex> lock(_grid_lock);
+  std::unique_lock<std::mutex> lock(_grid_lock);
 
   // mark the grid
   if (marking_readings.size() > 0) {
@@ -348,7 +348,7 @@ double SpatioTemporalVoxelGrid::GetTemporalClearingDuration(
   } else if (_decay_model == 1) {  // Exponential
     return _voxel_decay * std::exp(-time_delta);
   }
-  return _voxel_decay;  // PERSISTENT
+  return std::numeric_limits<double>::max();  // PERSISTENT
 }
 
 /*****************************************************************************/
@@ -400,7 +400,7 @@ void SpatioTemporalVoxelGrid::GetOccupancyPointCloud(
 bool SpatioTemporalVoxelGrid::ResetGrid(void)
 /*****************************************************************************/
 {
-  boost::unique_lock<boost::mutex> lock(_grid_lock);
+  std::unique_lock<std::mutex> lock(_grid_lock);
 
   // clear the voxel grid
   try {
@@ -419,7 +419,7 @@ void SpatioTemporalVoxelGrid::ResetGridArea(
   const occupany_cell & start, const occupany_cell & end, bool invert_area)
 /*****************************************************************************/
 {
-  boost::unique_lock<boost::mutex> lock(_grid_lock);
+  std::unique_lock<std::mutex> lock(_grid_lock);
 
   openvdb::DoubleGrid::ValueOnCIter cit_grid = _grid->cbeginValueOn();
   for (; cit_grid.test(); ++cit_grid)
